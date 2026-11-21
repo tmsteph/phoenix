@@ -1,0 +1,39 @@
+name: Verify Phoenix PR 56 pinned offline
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/verify-phoenix-pr56-pinned.yml
+
+permissions:
+  contents: read
+
+jobs:
+  offline-checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Checkout unchanged PR 56 head
+        uses: actions/checkout@v4
+        with:
+          ref: df3aef7221169ce9dd7925c494bae3923149bf49
+          persist-credentials: false
+      - name: Assert exact PR head
+        shell: bash
+        run: |
+          test "$(git rev-parse HEAD)" = df3aef7221169ce9dd7925c494bae3923149bf49
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install pinned Ruff
+        run: python -m pip install --disable-pip-version-check --no-input ruff==0.17.6
+      - name: Ruff changed files
+        run: ruff check src/sim.py src/test/test_thermal_exponential.py
+      - name: Ruff full source scope
+        run: ruff check src/ src/test/
+      - name: Python compile checks
+        run: python -m py_compile src/sim.py src/test/test_thermal_exponential.py
+      - name: Exact-head standard-library unit tests
+        run: PYTHONPATH=src python -m unittest -v src.test.test_thermal_exponential
