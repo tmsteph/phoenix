@@ -15,14 +15,14 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 8
     steps:
-      - name: Checkout unchanged PR 56 head
+      - name: Checkout PR 56 head with precision regression
         uses: actions/checkout@v4
         with:
-          ref: df3aef7221169ce9dd7925c494bae3923149bf49
+          ref: 51783eb4a3fc0e176a9179a3b870c0f23702995f
           persist-credentials: false
       - name: Assert exact PR head
         shell: bash
-        run: test "$(git rev-parse HEAD)" = df3aef7221169ce9dd7925c494bae3923149bf49
+        run: test "$(git rev-parse HEAD)" = 51783eb4a3fc0e176a9179a3b870c0f23702995f
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
